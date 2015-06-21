@@ -9,5 +9,30 @@ use App\Http\Controllers\Controller;
 
 class FileEntryController extends Controller
 {
-    //
+    /**
+     * Display resource listing.
+     *
+     * @return Response
+     */
+    public function index()
+    {
+    	$entries = Fileentry::all();
+
+    	return view('fileentries.index', compact('entries'));
+    }
+
+    public function add() {
+
+    	$file = Request::file('filefield');
+    	$extension = $file->getClientOriginalExtension();
+    	Storage::disk('local')->put($file->getFilename().'.'.$extension, File::get($file));
+    	$entry = new Fileentry();
+    	$entry->mime = $file->getClientMimeType();
+    	$entry->orig_filename = $file->getClientOriginalName();
+    	$entry->filename = $file->getFilename().'.'.$extension;
+
+    	$entry->save();
+
+    	return redirect('fileentry');
+    }
 }
